@@ -1,0 +1,8 @@
+---
+- name: Ensure OS is Debian or Ubuntu
+  ansible.builtin.fail:
+    msg: "This role only supports Debian or Ubuntu."
+  when: ansible_facts['distribution'] not in ['Debian', 'Ubuntu']
+
+- name: Include tasks for package installation
+  ansible.builtin.include_tasks: install_packages.yml

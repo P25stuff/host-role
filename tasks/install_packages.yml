@@ -1,0 +1,17 @@
+---
+- name: Update and upgrade apt packages
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: dist
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - git
+      - unzip
+      - dnsutils
+      - curl
+      - wget
+      - stm32flash
+      - libssl1.1
+    state: present
