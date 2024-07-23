@@ -1,0 +1,21 @@
+---
+- name: Reboot System
+  ansible.builtin.reboot:
+    reboot_timeout: 300
+    msg: "Rebooting the system to apply changes"
+
+- name: Restart DVM services
+  ansible.builtin.systemd:
+    name: "dvm_{{ item }}.service"
+    state: restarted
+    enabled: true
+    daemon_reload: true
+  loop: "{{ dvm_services }}"
+
+- name: Enable and start DVM services
+  ansible.builtin.systemd:
+    name: "dvm_{{ item }}.service"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop: "{{ dvm_services }}"
