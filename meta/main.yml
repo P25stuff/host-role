@@ -1,0 +1,17 @@
+galaxy_info:
+  author: thehedgefrog
+  role_name: fne_role
+  description: Opinionated Ansible role to install the DVM Project FNE
+
+  license: GPL-2.0-only
+
+  min_ansible_version: '2.9'
+
+  galaxy_tags:
+    - fne
+    - dvm
+    - dvmhost
+    - p25
+    - trunking
+
+dependencies: []
