@@ -1,0 +1,195 @@
+#jinja2: trim_blocks: "true", lstrip_blocks: "false"
+daemon: true
+
+log:
+    displayLevel: {{ hostvars[inventory_hostname]['vc2']['displayLevel'] | default(1) }}
+    fileLevel: {{ hostvars[inventory_hostname]['vc2']['fileLevel'] | default(1) }}
+    filePath: /var/log/{{ dvm_folder }}/
+    activityFilePath: /var/log/{{ dvm_folder }}/
+    fileRoot: {{ hostvars[inventory_hostname]['vc2']['fileRoot'] | default("DVM-VC-1") }}
+
+network:
+    enable: {{ hostvars[inventory_hostname]['vc2']['network_enable'] | default(true) }}
+    id: {{ hostvars[inventory_hostname]['vc2']['peer_id'] }}
+    address: {{ hostvars[inventory_hostname]['fne_address'] }}
+    port: {{ hostvars[inventory_hostname]['fne_port'] }}
+    password: {{ hostvars[inventory_hostname]['fne_password'] }}
+    encrypted: {{ hostvars[inventory_hostname]['fne_encrypted'] | default(false) }}
+    presharedKey: {{ hostvars[inventory_hostname]['fne_presharedKey'] | default("000102030405060708090A0B0C0D0E0F000102030405060708090A0B0C0D0E0F") }}
+    jitter: {{ hostvars[inventory_hostname]['jitter'] | default(360) }}
+    slot1: {{ hostvars[inventory_hostname]['slot1'] | default(true) }}
+    slot2: {{ hostvars[inventory_hostname]['slot2'] | default(true) }}
+    updateLookups: {{ hostvars[inventory_hostname]['updateLookups'] | default(true) }}
+    saveLookups: {{ hostvars[inventory_hostname]['saveLookups'] }}
+    allowActivityTransfer: {{ hostvars[inventory_hostname]['allowActivityTransfer'] | default(true) }}
+    allowDiagnosticTransfer: {{ hostvars[inventory_hostname]['allowDiagnosticTransfer'] | default(true) }}
+    debug: {{ hostvars[inventory_hostname]['network_debug'] | default(false) }}
+    restEnable: {{ hostvars[inventory_hostname]['vc2']['restEnable'] | default(true) }}
+    restAddress: {{ hostvars[inventory_hostname]['vc2']['restAddress'] }}
+    restPort: {{ hostvars[inventory_hostname]['vc2']['restPort'] }}
+    restPassword: {{ hostvars[inventory_hostname]['restPassword'] }}
+    restDebug: {{ hostvars[inventory_hostname]['restDebug'] | default(false) }}
+
+protocols:
+    p25:
+        enable: {{ hostvars[inventory_hostname]['p25_enable'] | default(true) }}
+        tduPreambleCount: {{ hostvars[inventory_hostname]['tduPreambleCount'] | default(6) }}
+        control:
+            enable: {{ hostvars[inventory_hostname]['vc2']['control']['enable'] | default(false) }}
+            ackRequests: {{ hostvars[inventory_hostname]['vc2']['control']['ackRequests'] | default(true) }}
+            dedicated: {{ hostvars[inventory_hostname]['vc2']['control']['dedicated'] | default(false) }}
+            broadcast: {{ hostvars[inventory_hostname]['vc2']['control']['broadcast'] | default(false) }}
+            interval: {{ hostvars[inventory_hostname]['vc2']['control']['interval'] | default(300) }}
+            duration: {{ hostvars[inventory_hostname]['vc2']['control']['duration'] | default(1) }}
+            disableTSDUMBF: {{ hostvars[inventory_hostname]['vc2']['control']['disableTSDUMBF'] | default(false) }}
+            enableTimeDateAnn: {{ hostvars[inventory_hostname]['vc2']['control']['enableTimeDateAnn'] | default(false) }}
+            disableGrantSourceIdCheck: {{ hostvars[inventory_hostname]['vc2']['control']['disableGrantSourceIdCheck'] | default(false) }}
+            redundantImmediate: {{ hostvars[inventory_hostname]['vc2']['control']['redundantImmediate'] | default(true) }}
+            redundantGrantTransmit: {{ hostvars[inventory_hostname]['vc2']['control']['redundantGrantTransmit'] | default(false) }}
+        controlOnly: {{ hostvars[inventory_hostname]['vc2']['controlOnly'] | default(false) }}
+        disableNetworkHDU: {{ hostvars[inventory_hostname]['vc2']['disableNetworkHDU'] | default(false) }}
+        disableNetworkGrant: {{ hostvars[inventory_hostname]['vc2']['disableNetworkGrant'] | default(false) }}
+        inhibitUnauthorized: {{ hostvars[inventory_hostname]['vc2']['inhibitUnauthorized'] | default(false) }}
+        legacyGroupGrnt: {{ hostvars[inventory_hostname]['vc2']['legacyGroupGrnt'] | default(true) }}
+        legacyGroupReg: {{ hostvars[inventory_hostname]['vc2']['legacyGroupReg'] | default(false) }}
+        convNetGrantDemand: {{ hostvars[inventory_hostname]['vc2']['convNetGrantDemand'] | default(false) }}
+        verifyAff: {{ hostvars[inventory_hostname]['vc2']['verifyAff'] | default(false) }}
+        verifyReg: {{ hostvars[inventory_hostname]['vc2']['verifyReg'] | default(false) }}
+        disableUnitRegTimeout: {{ hostvars[inventory_hostname]['vc2']['disableUnitRegTimeout'] | default(false) }}
+        requireLLAForReg: {{ hostvars[inventory_hostname]['LLA_Active'] | default(false) }}
+        dumpDataPacket: {{ hostvars[inventory_hostname]['vc2']['dumpDataPacket'] | default(false) }}
+        repeatDataPacket: {{ hostvars[inventory_hostname]['vc2']['repeatDataPacket'] | default(true) }}
+        dumpTsbkData: {{ hostvars[inventory_hostname]['vc2']['dumpTsbkData'] | default(false) }}
+        callHang: {{ hostvars[inventory_hostname]['vc2']['callHang'] | default(5) }}
+        noStatusAck: {{ hostvars[inventory_hostname]['vc2']['noStatusAck'] | default(false) }}
+        noMessageAck: {{ hostvars[inventory_hostname]['vc2']['noMessageAck'] | default(true) }}
+        unitToUnitAvailCheck: {{ hostvars[inventory_hostname]['vc2']['unitToUnitAvailCheck'] | default(false) }}
+        allowExplicitSourceId: {{ hostvars[inventory_hostname]['vc2']['allowExplicitSourceId'] | default(true) }}
+        sndcpGrant: {{ hostvars[inventory_hostname]['vc2']['sndcpGrant'] | default(false) }}
+        silenceThreshold: {{ hostvars[inventory_hostname]['vc2']['silenceThreshold'] | default(124) }}
+        frameLossThreshold: {{ hostvars[inventory_hostname]['vc2']['frameLossThreshold'] | default(6) }}
+        queueSize: {{ hostvars[inventory_hostname]['vc2']['queueSize'] | default(12) }}
+        verbose: {{ hostvars[inventory_hostname]['vc2']['verbose'] | default(true) }}
+        debug: {{ hostvars[inventory_hostname]['vc2']['debug'] | default(false) }}
+
+system:
+    identity: {{ hostvars[inventory_hostname]['vc2']['host_identity'] }}
+    timeout: {{ hostvars[inventory_hostname]['vc2']['timeout'] | default(180) }}
+    duplex: {{ hostvars[inventory_hostname]['vc2']['duplex'] | default(true) }}
+    simplexSameFrequency: {{ hostvars[inventory_hostname]['vc2']['simplexSameFrequency'] | default(false) }}
+    modeHang: {{ hostvars[inventory_hostname]['vc2']['modeHang'] | default(10) }}
+    fixedMode: {{ hostvars[inventory_hostname]['vc2']['fixedMode'] | default(false) }}
+    rfTalkgroupHang: {{ hostvars[inventory_hostname]['vc2']['rfTalkgroupHang'] | default(10) }}
+    activeTickDelay: {{ hostvars[inventory_hostname]['vc2']['activeTickDelay'] | default(5) }}
+    idleTickDelay: {{ hostvars[inventory_hostname]['vc2']['idleTickDelay'] | default(5) }}
+    localTimeOffset: {{ hostvars[inventory_hostname]['localTimeOffset'] | default(0) }}
+
+    info:
+        latitude: {{ hostvars[inventory_hostname]['latitude'] | default("-83.689428") }}
+        longitude: {{ hostvars[inventory_hostname]['longitude'] | default("-39.194973")}}
+        height: {{ hostvars[inventory_hostname]['height'] | default(1) }}
+        power: {{ hostvars[inventory_hostname]['power'] | default(10) }}
+        location: {{ hostvars[inventory_hostname]['location'] | default("Repeater Site, Antarctica") }}
+
+    config:
+        authoritative: false
+        supervisor: false
+        channelId: {{ hostvars[inventory_hostname]['vc2']['iden_channel'] }}
+        channelNo: {{ hostvars[inventory_hostname]['vc2']['voice_channel'] }}
+        controlCh:
+            restAddress: {{ hostvars[inventory_hostname]['cc']['restAddress'] }}
+            restPort: {{ hostvars[inventory_hostname]['cc']['restPort'] }}
+            restPassword: {{ hostvars[inventory_hostname]['restPassword'] }}
+            restSsl: {{ hostvars[inventory_hostname]['restSsl'] | default(false) }}
+            notifyEnable: {{ hostvars[inventory_hostname]['notifyEnable'] | default(true) }}
+            presence: {{ hostvars[inventory_hostname]['presence'] | default(120) }}
+        voiceChNo:
+            - channelId: {{ hostvars[inventory_hostname]['vc2']['iden_channel'] }}
+              channelNo: {{ hostvars[inventory_hostname]['vc2']['voice_channel'] }}
+              restAddress: {{ hostvars[inventory_hostname]['vc2']['restAddress'] }}
+              restPort: {{ hostvars[inventory_hostname]['vc2']['restPort'] }}
+              restPassword: {{ hostvars[inventory_hostname]['restPassword'] }}
+              restSsl: {{ hostvars[inventory_hostname]['restSsl'] | default(false) }}
+        nac: {{ hostvars[inventory_hostname]['site_nac'] }}
+        pSuperGroup: {{ system_pSuperGroup }}
+        announcementGroup: {{ system_announcementGroup }}
+        netId: {{ system_WACN }}
+        sysId: {{ system_sysId }}
+        rfssId: {{ hostvars[inventory_hostname]['RFSS'] | default(1) }}
+        siteId: {{ hostvars[inventory_hostname]['SiteID'] }}
+
+    cwId:
+        enable: {{ hostvars[inventory_hostname]['vc2']['cwId']['enable'] | default(true) }}
+        time: {{ hostvars[inventory_hostname]['vc2']['cwId']['time'] | default(15) }}
+        callsign: {{ hostvars[inventory_hostname]['vc2']['cwId']['callsign'] | default(system_WACN) }}
+
+    modem:
+        protocol:
+            type: {{ hostvars[inventory_hostname]['vc2']['modem_type'] | default("uart") }}
+            uart:
+                port: {{ hostvars[inventory_hostname]['vc2']['modem_port'] }}
+                speed: {{ hostvars[inventory_hostname]['vc2']['modem_speed'] | default(115200) }}
+        rxInvert: {{ hostvars[inventory_hostname]['vc2']['rxInvert'] | default(false) }}
+        txInvert: {{ hostvars[inventory_hostname]['vc2']['txInvert'] | default(false) }}
+        pttInvert: {{ hostvars[inventory_hostname]['vc2']['pttInvert'] | default(false) }}
+        dcBlocker: {{ hostvars[inventory_hostname]['vc2']['dcBlocker'] | default(true) }}
+        cosLockout: {{ hostvars[inventory_hostname]['vc2']['cosLockout'] | default(false) }}
+        fdmaPreamble: {{ hostvars[inventory_hostname]['vc2']['fdmaPreamble'] | default(80) }}
+        dmrRxDelay: {{ hostvars[inventory_hostname]['vc2']['dmrRxDelay'] | default(7) }}
+        p25CorrCount: {{ hostvars[inventory_hostname]['vc2']['p25CorrCount'] | default(8) }}
+        dmrFifoLength: {{ hostvars[inventory_hostname]['vc2']['dmrFifoLength'] | default(505) }}
+        p25FifoLength: {{ hostvars[inventory_hostname]['vc2']['p25FifoLength'] | default(442) }}
+        nxdnFifoLength: {{ hostvars[inventory_hostname]['vc2']['nxdnFifoLength'] | default(538) }}
+        hotspot:
+            dmrDiscBWAdj: {{ hostvars[inventory_hostname]['vc2']['hotspot']['dmrDiscBWAdj'] | default(0) }}
+            dmrPostBWAdj: {{ hostvars[inventory_hostname]['vc2']['hotspot']['dmrPostBWAdj'] | default(0) }}
+            p25DiscBWAdj: {{ hostvars[inventory_hostname]['vc2']['hotspot']['p25DiscBWAdj'] | default(0) }}
+            p25PostBWAdj: {{ hostvars[inventory_hostname]['vc2']['hotspot']['p25PostBWAdj'] | default(0) }}
+            nxdnDiscBWAdj: {{ hostvars[inventory_hostname]['vc2']['hotspot']['nxdnDiscBWAdj'] | default(0) }}
+            nxdnPostBWAdj: {{ hostvars[inventory_hostname]['vc2']['hotspot']['nxdnPostBWAdj'] | default(0) }}
+            adfGainMode: {{ hostvars[inventory_hostname]['vc2']['hotspot']['adfGainMode'] | default(2) }}
+            afcEnable: {{ hostvars[inventory_hostname]['vc2']['hotspot']['afcEnable'] | default(true) }}
+            afcKI: {{ hostvars[inventory_hostname]['vc2']['hotspot']['afcKI'] | default(13) }}
+            afcKP: {{ hostvars[inventory_hostname]['vc2']['hotspot']['afcKP'] | default(5) }}
+            afcRange: {{ hostvars[inventory_hostname]['vc2']['hotspot']['afcRange'] | default(1) }}
+            txTuning: {{ hostvars[inventory_hostname]['vc2']['hotspot']['txTuning'] | default(0) }}
+            rxTuning: {{ hostvars[inventory_hostname]['vc2']['hotspot']['rxTuning'] | default(0) }}
+        repeater:
+            dmrSymLvl3Adj: {{ hostvars[inventory_hostname]['vc2']['repeater']['dmrSymLvl3Adj'] | default(0) }}
+            dmrSymLvl1Adj: {{ hostvars[inventory_hostname]['vc2']['repeater']['dmrSymLvl1Adj'] | default(0) }}
+            p25SymLvl3Adj: {{ hostvars[inventory_hostname]['vc2']['repeater']['p25SymLvl3Adj'] | default(0) }}
+            p25SymLvl1Adj: {{ hostvars[inventory_hostname]['vc2']['repeater']['p25SymLvl1Adj'] | default(0) }}
+            nxdnSymLvl3Adj: {{ hostvars[inventory_hostname]['vc2']['repeater']['nxdnSymLvl3Adj'] | default(0) }}
+            nxdnSymLvl1Adj: {{ hostvars[inventory_hostname]['vc2']['repeater']['nxdnSymLvl1Adj'] | default(0) }}
+        softpot:
+            rxCoarse: {{ hostvars[inventory_hostname]['vc2']['softpot']['rxCoarse'] | default(127) }}
+            rxFine: {{ hostvars[inventory_hostname]['vc2']['softpot']['rxFine'] | default(127) }}
+            txCoarse: {{ hostvars[inventory_hostname]['vc2']['softpot']['txCoarse'] | default(127) }}
+            txFine: {{ hostvars[inventory_hostname]['vc2']['softpot']['txFine'] | default(127) }}
+            rssiCoarse: {{ hostvars[inventory_hostname]['vc2']['softpot']['rssiCoarse'] | default(127) }}
+            rssiFine: {{ hostvars[inventory_hostname]['vc2']['softpot']['rssiFine'] | default(127) }}
+        rxDCOffset: {{ hostvars[inventory_hostname]['vc2']['rxDCOffset'] | default(0) }}
+        txDCOffset: {{ hostvars[inventory_hostname]['vc2']['txDCOffset'] | default(0) }}
+        rxLevel: {{ hostvars[inventory_hostname]['vc2']['rxLevel'] | default(50) }}
+        txLevel: {{ hostvars[inventory_hostname]['vc2']['txLevel'] | default(50) }}
+        rssiMappingFile: {{ hostvars[inventory_hostname]['vc2']['rssiMappingFile'] | default("RSSI.dat") }}
+        packetPlayoutTime: {{ hostvars[inventory_hostname]['vc2']['packetPlayoutTime'] | default(10) }}
+        disableOFlowReset: {{ hostvars[inventory_hostname]['vc2']['disableOFlowReset'] | default(false) }}
+        ignoreModemConfigArea: {{ hostvars[inventory_hostname]['vc2']['ignoreModemConfigArea'] | default(false) }}
+        dumpModemStatus: {{ hostvars[inventory_hostname]['vc2']['dumpModemStatus'] | default(false) }}
+        trace: {{ hostvars[inventory_hostname]['vc2']['modem_trace'] | default(false) }}
+        debug: {{ hostvars[inventory_hostname]['vc2']['modem_debug'] | default(false) }}
+
+    iden_table:
+        file: /opt/{{ dvm_folder }}/configs/iden_table.dat
+        time: {{ hostvars[inventory_hostname]['iden_table_time'] | default(30) }}
+
+    radio_id:
+        file: /opt/{{ dvm_folder }}/configs/rid_acl.dat
+        time: {{ hostvars[inventory_hostname]['rid_acl_time'] | default(2) }}
+        acl: {{ hostvars[inventory_hostname]['rid_acl'] | default(false) }}
+
+    talkgroup_id:
+        file: /opt/{{ dvm_folder }}/configs/talkgroup_rules.yml
+        time: {{ hostvars[inventory_hostname]['talkgroup_rules_time'] | default(2) }}
+        acl: {{ hostvars[inventory_hostname]['talkgroup_acl'] | default(false) }}

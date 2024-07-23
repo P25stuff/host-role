@@ -1,0 +1,33 @@
+---
+- name: Generate iden_table.dat from template
+  ansible.builtin.template:
+    src: templates/configs/iden_table.dat.j2
+    dest: "/opt/{{ dvm_folder }}/configs/iden_table.dat"
+
+- name: Generate CC configuration from template
+  ansible.builtin.template:
+    src: templates/configs/configCC.yml.j2
+    dest: "/opt/{{ dvm_folder }}/configs/configCC.yml"
+
+- name: Generate VC1 configuration from template
+  ansible.builtin.template:
+    src: templates/configs/configVC1.yml.j2
+    dest: "/opt/{{ dvm_folder }}/configs/configVC1.yml"
+
+- name: Generate VC2 configuration from template
+  ansible.builtin.template:
+    src: templates/configs/configVC2.yml.j2
+    dest: "/opt/{{ dvm_folder }}/configs/configVC2.yml"
+  when: dual_voice_channel | bool
+
+- name: Fetch the generated templates for local backup
+  become: false
+  ansible.builtin.fetch:
+    src: "/opt/{{ dvm_folder }}/configs/{{ item }}"
+    dest: "./local_backups/site-{{ hostvars[inventory_hostname]['SiteID'] }}/"
+    flat: yes
+  loop:
+    - configCC.yml
+    - configVC1.yml
+    - configVC2.yml
+    - iden_table.dat

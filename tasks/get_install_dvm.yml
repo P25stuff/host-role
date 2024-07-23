@@ -1,0 +1,116 @@
+---
+- name: Set list of DVM services to be created based on configuration flags
+  ansible.builtin.set_fact:
+    dvm_services: "{{
+      ['DVRS'] if dvrs_mode | bool else
+      (['CC', 'VC1'] + (['VC2'] if dual_voice_channel | bool else []))
+      }}"
+
+- name: Stop DVM services if they exist
+  ansible.builtin.import_tasks: stop_services.yml
+
+- name: Create necessary directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "/opt/{{ dvm_folder }}/"
+    - "/opt/{{ dvm_folder }}/configs/"
+    - "/var/log/{{ dvm_folder }}/"
+
+- name: Include configuration generation tasks
+  ansible.builtin.include_tasks: generate_configs.yml
+
+- name: Generate new build via GitHub Action
+  ansible.builtin.include_tasks: github_action_run.yml
+  when: rebuild | default(false) | bool
+
+- name: Confirm system architecture
+  ansible.builtin.fail:
+    msg: "Unsupported architecture"
+  when: ansible_architecture not in ['x86_64', 'aarch64', 'armv7l', 'armhf']
+
+- name: Get latest release data from GitHub API
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/CANTACS/dvm-build/releases/latest"
+    method: GET
+    headers:
+      Accept: "application/vnd.github.v3+json"
+    return_content: true
+  register: latest_release
+
+- name: Determine system architecture for the build
+  ansible.builtin.set_fact:
+    architecture_map:
+      x86_64: amd64
+      aarch64: arm64
+      armv7l: arm
+      armhf: armhf
+
+- name: Set architecture specific package name pattern
+  ansible.builtin.set_fact:
+    package_pattern: "dvm-build-.*-{{ architecture_map[ansible_architecture] }}.zip"
+
+- name: Find and download the appropriate architecture build
+  ansible.builtin.get_url:
+    url: "{{ latest_release.json.assets | selectattr('name', 'match', package_pattern) | map(attribute='browser_download_url') | first }}"
+    dest: "/tmp/dvm_latest.zip"
+    force: true
+  when: architecture_map[ansible_architecture] is defined
+  no_log: true
+
+- name: Remove existing binaries while preserving configs directory
+  ansible.builtin.shell:
+    cmd: "find /opt/{{ dvm_folder }}/ -mindepth 1 -maxdepth 1 ! -name 'configs' -exec rm -rf {} +"
+
+- name: Create a temporary directory for extraction
+  ansible.builtin.tempfile:
+    state: directory
+  register: tmp_dir
+
+- name: Unzip the downloaded file to the temporary directory
+  ansible.builtin.unarchive:
+    src: "/tmp/dvm_latest.zip"
+    dest: "{{ tmp_dir.path }}"
+    remote_src: true
+    creates: "{{ tmp_dir.path }}/dvmhost"
+
+- name: Move necessary binaries to /opt/{{ dvm_folder }}, including 'dvmmon' when available, excluding 'dvmfne'
+  ansible.builtin.shell:
+    cmd: >
+      find {{ tmp_dir.path }} -type f \( -name 'dvmcmd' -o -name 'dvmhost' -o -name 'dvmmon' \)
+      \! -name 'dvmfne' -exec mv {} /opt/{{ dvm_folder }}/ \;
+
+- name: Remove the temporary directory
+  ansible.builtin.file:
+    path: "{{ tmp_dir.path }}"
+    state: absent
+
+- name: Check if DVM services exist
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/dvm_{{ item }}.service"
+  loop: "{{ dvm_services }}"
+  register: services_status
+
+- name: Start DVM services if they exist
+  ansible.builtin.systemd:
+    name: "dvm_{{ service_status.item }}.service"
+    state: started
+  loop: "{{ services_status.results }}"
+  when: service_status.stat.exists
+  loop_control:
+    loop_var: service_status
+
+- name: Create DVM service files based on configuration
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/services/dvm_template.service.j2"
+    dest: "/etc/systemd/system/dvm_{{ service_status.item }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ services_status.results }}"
+  loop_control:
+    loop_var: service_status
+  notify:
+    - Enable and start DVM services
