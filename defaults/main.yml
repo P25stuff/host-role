@@ -1,0 +1,16 @@
+---
+
+# Set this to true if Netbird is installed on the host
+use_netbird: false
+
+# Set this variable to use a custom folder name throughout the role
+dvm_folder: dvm
+
+# Set this variable to force a rebuild using the GitHub action.
+# Rebuild will happen if the `dvmhost` project had changes since the last action run. GitHub token is mandatory.
+rebuild: false
+
+# Set this variable to force the GitHub action to rebuild, regardless of whether the `dvmhost` project
+# had changes since the last action run. `rebuild` must be set to `true` for this variable to be considered.
+# GitHub token is mandatory.
+force_rebuild: false
