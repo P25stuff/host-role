@@ -1,0 +1,18 @@
+[Unit]
+Description=DVM Trunking Radio Service - {{ service_status.item }}
+After=syslog.target network.target
+{% if use_netbird %}
+Wants=netbird.service
+Requires=netbird.service
+{% endif %}
+
+[Service]
+User=root
+Type=forking
+ExecStartPre=/bin/sh -c 'until getent hosts {{ hostvars[inventory_hostname]['fne_address'] }}; do sleep 5; done'
+ExecStart=/opt/{{ dvm_folder }}/dvmhost -c /opt/{{ dvm_folder }}/configs/config{{ service_status.item }}.yml
+Restart=on-abnormal
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

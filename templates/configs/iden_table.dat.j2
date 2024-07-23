@@ -1,0 +1,4 @@
+# ChId,Base Freq,Spacing (khz),Input Offset (mhz),Bandwidth (khz),<newline>
+{% for line in hostvars[inventory_hostname]['chid_details'] %}
+{{ line.chid }},{{ line.base_freq }},6.25,{{ line.input_offset }},12.5,
+{% endfor %}
