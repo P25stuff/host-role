@@ -1,0 +1,16 @@
+---
+- name: Check if host is a Raspberry Pi
+  ansible.builtin.stat:
+    path: /proc/device-tree/model
+  register: pi_check
+
+- name: Execute Raspberry Pi specific tasks
+  ansible.builtin.import_tasks: raspberrypi.yml
+  when: pi_check.stat.exists
+
+- name: Execute Debian or Ubuntu specific tasks
+  ansible.builtin.import_tasks: debian.yml
+  when: not pi_check.stat.exists
+
+- name: Get and install DVM binaries
+  ansible.builtin.import_tasks: get_install_dvm.yml
