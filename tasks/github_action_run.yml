@@ -1,0 +1,54 @@
+---
+- name: Fetch the latest workflow run from GitHub
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/P25stuff/dvm-build/actions/runs"
+    method: GET
+    headers:
+      Accept: "application/vnd.github.v3+json"
+    return_content: true
+  register: github_runs
+
+- name: Trigger new GitHub Action run
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/P25stuff/dvm-build/actions/workflows/dvmhost-build-action.yml/dispatches"
+    method: POST
+    headers:
+      Authorization: "token {{ github_token }}"
+      Accept: "application/vnd.github.v3+json"
+    body_format: json
+    body:
+      ref: "main"
+      inputs:
+        force: "{{ force_rebuild | default(false) | bool }}"
+    status_code: 204
+  register: trigger_response
+
+- name: Wait for the workflow to start
+  pause:
+    seconds: 10
+
+- name: Get the latest workflow run ID after trigger
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/P25stuff/dvm-build/actions/runs?per_page=1"
+    method: GET
+    headers:
+      Accept: "application/vnd.github.v3+json"
+    return_content: true
+  register: latest_run
+
+- name: Set workflow run ID
+  set_fact:
+    workflow_run_id: "{{ latest_run.json.workflow_runs[0].id }}"
+
+- name: Wait for the workflow to complete
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/P25stuff/dvm-build/actions/runs/{{ workflow_run_id }}"
+    method: GET
+    headers:
+      Accept: "application/vnd.github.v3+json"
+    return_content: true
+  register: workflow_status
+  until: workflow_status.json.status in ['completed', 'failure', 'cancelled']
+  retries: 50
+  delay: 15
+  when: workflow_run_id is defined
