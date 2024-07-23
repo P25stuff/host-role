@@ -1,0 +1,13 @@
+---
+- name: Check if DVM service exists
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/dvm_{{ item }}.service"
+  loop: "{{ dvm_services }}"
+  register: services_status
+
+- name: Stop DVM service if it exists
+  ansible.builtin.systemd:
+    name: "dvm_{{ item.item }}.service"
+    state: stopped
+  loop: "{{ services_status.results }}"
+  when: item.stat.exists
